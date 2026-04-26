@@ -1,0 +1,82 @@
+{
+  "theme": "light",
+  "archetype": "Archetype 4: Swiss & High-Contrast (Industrial Variant)",
+  "vibe": "Precise, professional, technical, trustworthy. CAD-software meets modern SaaS.",
+  "colors": {
+    "background": "#F4F4F5",
+    "surface": "#FFFFFF",
+    "primary": "#FF3333",
+    "primary_hover": "#CC0000",
+    "text_main": "#09090B",
+    "text_muted": "#52525B",
+    "border": "#E4E4E7",
+    "accent": "#FF5722",
+    "success": "#16A34A",
+    "warning": "#EAB308",
+    "danger": "#DC2626"
+  },
+  "typography": {
+    "heading_font": "IBM Plex Sans",
+    "body_font": "IBM Plex Sans",
+    "mono_font": "IBM Plex Mono",
+    "hierarchy": {
+      "h1": "text-3xl sm:text-4xl font-bold tracking-tight",
+      "h2": "text-xl sm:text-2xl font-semibold tracking-tight",
+      "h3": "text-lg font-medium",
+      "body": "text-sm sm:text-base leading-relaxed",
+      "data_numbers": "font-mono text-sm tracking-tight",
+      "labels": "text-xs font-mono uppercase tracking-[0.1em] text-zinc-500"
+    }
+  },
+  "spacing_and_layout": {
+    "strategy": "Mode B: The Control Room Grid (For Dashboards/Analytics)",
+    "container_padding": "p-4 md:p-6 lg:p-8",
+    "gap_system": "gap-4 md:gap-6",
+    "border_radius": "rounded-sm",
+    "alignment": "Left-align forms and dense content. Right-align monetary/number values in tables.",
+    "grid_structure": "grid-cols-1 md:grid-cols-3 lg:grid-cols-4. Use tight gaps for data correlation."
+  },
+  "component_rules": {
+    "cards": "Flat white background, 1px solid border (border-zinc-200), NO shadow. Technical and cardless feel.",
+    "buttons": "Sharp corners (rounded-sm). Primary button uses solid #FF3333 with white text. Hover states must explicitly set contrast (e.g., hover:bg-[#CC0000] hover:text-white).",
+    "inputs": "Shadcn standard inputs, 1px border, focus state must have high contrast ring (focus:ring-2 focus:ring-[#FF3333]).",
+    "navigation": "Sticky left sidebar or fixed top header with glassmorphism (backdrop-blur-md bg-white/80) and 1px bottom border.",
+    "tables": "Dense. Use IBM Plex Mono for all numeric columns (measurements, time, price).",
+    "data_testid": "MANDATORY. All interactive elements (buttons, inputs, tabs) must have data-testid attributes."
+  },
+  "motion_and_interaction": {
+    "hover": "Subtle border color changes or -translate-y-px. No bouncy animations.",
+    "transitions": "transition-all duration-200 ease-in-out",
+    "loaders": "Use minimal spinner or progressive loading bars using the primary color."
+  },
+  "media": {
+    "image_urls": [
+      {
+        "url": "https://images.unsplash.com/photo-1738162837438-92ff852619a1",
+        "description": "Close up of machine cutting metal",
+        "category": "hero_background_or_auth"
+      },
+      {
+        "url": "https://images.pexels.com/photos/36522023/pexels-photo-36522023.jpeg",
+        "description": "Modern laser cutting machine",
+        "category": "feature_or_empty_state"
+      },
+      {
+        "url": "https://images.unsplash.com/photo-1759210358942-79b6fff8f2ab",
+        "description": "Abstract grid line texture",
+        "category": "texture_overlay"
+      }
+    ],
+    "icons": "lucide-react"
+  },
+  "instructions_to_main_agent": [
+    "Use purely Shadcn UI components but strip away any soft shadows to make them feel industrial and precise.",
+    "For the cost calculator, use an F-pattern layout. The real-time quote summary should stick to the right column (col-span-1) while the inputs take up the left (col-span-2 or 3).",
+    "All currency (USD), measurements (mm/cm), and time (min/hr) outputs MUST use the mono font (IBM Plex Mono or similar).",
+    "Implement the UI in Spanish as requested (Cotizador, Materiales, Historial, etc.).",
+    "Avoid using the card component too heavily; instead, create a 'Control Room' dense UI with 1px borders.",
+    "Ensure the PDF export/print preview uses a stark white background and removes any UI navigational elements.",
+    "Ensure all components are built using .js files (JSX) and not .tsx.",
+    "Import IBM Plex Sans and IBM Plex Mono from Google Fonts in index.html or global CSS."
+  ]
+}
