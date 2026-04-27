@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import { useNavigate, useParams } from "react-router-dom";
+import { useNavigate, useParams, useSearchParams } from "react-router-dom";
 import { ArrowLeft, Printer, Zap } from "lucide-react";
 import { Button } from "../components/ui/button";
 import { QuotesAPI, SettingsAPI } from "@/lib/api";
@@ -8,6 +8,7 @@ import { fmtMoney, fmtNum, fmtDate } from "@/lib/calc";
 export default function Imprimir() {
   const { id } = useParams();
   const navigate = useNavigate();
+  const [searchParams] = useSearchParams();
   const [quote, setQuote] = useState(null);
   const [settings, setSettings] = useState(null);
   const [error, setError] = useState(null);
@@ -20,6 +21,35 @@ export default function Imprimir() {
       })
       .catch(() => setError("No se pudo cargar la cotización"));
   }, [id]);
+
+  // Auto-trigger print when opened with ?auto=1 (used by the print button to bypass sandbox)
+  useEffect(() => {
+    if (quote && settings && searchParams.get("auto") === "1") {
+      const t = setTimeout(() => {
+        try {
+          window.print();
+        } catch (e) {
+          // Sandbox or other restriction; user can still use Ctrl/Cmd+P
+        }
+      }, 600);
+      return () => clearTimeout(t);
+    }
+  }, [quote, settings, searchParams]);
+
+  const handlePrint = () => {
+    // window.print() is blocked when the page runs inside a sandboxed iframe
+    // (e.g. the preview environment). Opening in a new tab avoids the sandbox.
+    const url = `${window.location.pathname}?auto=1`;
+    const popup = window.open(url, "_blank", "noopener,noreferrer");
+    if (!popup) {
+      // Pop-up blocked — fall back to in-place print.
+      try {
+        window.print();
+      } catch (e) {
+        alert("Tu navegador bloqueó la impresión. Usa Ctrl/Cmd + P para imprimir.");
+      }
+    }
+  };
 
   if (error) {
     return (
@@ -52,7 +82,7 @@ export default function Imprimir() {
             <ArrowLeft className="w-4 h-4 mr-2" /> Volver
           </Button>
           <Button
-            onClick={() => window.print()}
+            onClick={handlePrint}
             className="rounded-sm bg-[#FF3333] hover:bg-[#CC0000]"
             data-testid="btn-print"
           >
