@@ -47,8 +47,8 @@ export default function Configuracion() {
       toast.error("El archivo debe ser una imagen");
       return;
     }
-    if (file.size > 1024 * 1024) {
-      toast.error("La imagen es muy grande (máximo 1MB)");
+    if (file.size > 5 * 1024 * 1024) {
+      toast.error("La imagen es muy grande (máximo 5MB)");
       return;
     }
     try {
@@ -165,7 +165,7 @@ export default function Configuracion() {
                     )}
                   </div>
                   <p className="text-[11px] text-zinc-500 mt-2 font-mono">
-                    PNG / JPG / SVG · máx. 1MB · se mostrará en la cotización impresa.
+                    PNG / JPG / SVG · máx. 5MB · se mostrará en la cotización impresa.
                   </p>
                 </div>
               </div>
