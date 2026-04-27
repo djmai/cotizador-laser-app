@@ -40,6 +40,47 @@ export default function Configuracion() {
 
   const update = (k, v) => setForm({ ...form, [k]: v });
 
+  const readFileAsDataUrl = (file) =>
+    new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+
+  const compressImage = (file) =>
+    new Promise((resolve, reject) => {
+      const url = URL.createObjectURL(file);
+      const img = new Image();
+      img.onload = () => {
+        const MAX = 800;
+        const ratio = Math.min(1, MAX / Math.max(img.width, img.height));
+        const w = Math.round(img.width * ratio);
+        const h = Math.round(img.height * ratio);
+        const canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        const ctx = canvas.getContext("2d");
+        // Preserve transparency for PNG, otherwise white bg for JPEG
+        const hasAlpha = file.type === "image/png" || file.type === "image/webp";
+        if (!hasAlpha) {
+          ctx.fillStyle = "#FFFFFF";
+          ctx.fillRect(0, 0, w, h);
+        }
+        ctx.drawImage(img, 0, 0, w, h);
+        const outType = hasAlpha ? "image/png" : "image/jpeg";
+        const quality = hasAlpha ? undefined : 0.85;
+        const dataUrl = canvas.toDataURL(outType, quality);
+        URL.revokeObjectURL(url);
+        resolve(dataUrl);
+      };
+      img.onerror = (err) => {
+        URL.revokeObjectURL(url);
+        reject(err);
+      };
+      img.src = url;
+    });
+
   const handleLogoChange = async (e) => {
     const file = e.target.files?.[0];
     if (!file) return;
@@ -52,17 +93,17 @@ export default function Configuracion() {
       return;
     }
     try {
-      const dataUrl = await new Promise((resolve, reject) => {
-        const reader = new FileReader();
-        reader.onload = () => resolve(reader.result);
-        reader.onerror = reject;
-        reader.readAsDataURL(file);
-      });
+      // SVG is vector and already tiny — store as-is. Bitmap formats are resized & compressed.
+      const dataUrl =
+        file.type === "image/svg+xml"
+          ? await readFileAsDataUrl(file)
+          : await compressImage(file);
       const updated = await SettingsAPI.update({ logoDataUrl: dataUrl });
       setForm(updated);
-      toast.success("Logo cargado");
+      const sizeKB = Math.round((dataUrl.length * 0.75) / 1024);
+      toast.success(`Logo cargado (~${sizeKB} KB optimizado)`);
     } catch (err) {
-      toast.error("No se pudo cargar la imagen");
+      toast.error("No se pudo procesar la imagen");
     } finally {
       if (fileInputRef.current) fileInputRef.current.value = "";
     }
@@ -165,7 +206,7 @@ export default function Configuracion() {
                     )}
                   </div>
                   <p className="text-[11px] text-zinc-500 mt-2 font-mono">
-                    PNG / JPG / SVG · máx. 5MB · se mostrará en la cotización impresa.
+                    PNG / JPG / SVG · máx. 5MB · se redimensiona y comprime automáticamente para optimizar el almacenamiento.
                   </p>
                 </div>
               </div>
