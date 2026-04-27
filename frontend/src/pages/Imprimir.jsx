@@ -67,12 +67,22 @@ export default function Imprimir() {
           <div className="flex items-start justify-between border-b-2 border-zinc-900 pb-6 mb-6">
             <div>
               <div className="flex items-center gap-2 mb-3">
-                <div className="w-8 h-8 bg-[#FF3333] flex items-center justify-center">
-                  <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
-                </div>
-                <span className="text-sm font-bold tracking-tight">
-                  {settings.businessName || "CORTEX LÁSER"}
-                </span>
+                {settings.logoDataUrl ? (
+                  <img
+                    src={settings.logoDataUrl}
+                    alt={settings.businessName || "Logo"}
+                    className="h-10 w-auto max-w-[160px] object-contain"
+                  />
+                ) : (
+                  <>
+                    <div className="w-8 h-8 bg-[#FF3333] flex items-center justify-center">
+                      <Zap className="w-4 h-4 text-white" strokeWidth={2.5} />
+                    </div>
+                    <span className="text-sm font-bold tracking-tight">
+                      {settings.businessName || "CORTEX LÁSER"}
+                    </span>
+                  </>
+                )}
               </div>
               <h1 className="text-3xl font-bold tracking-tight">COTIZACIÓN</h1>
               <div className="text-xs font-mono text-zinc-500 mt-1">
@@ -120,14 +130,16 @@ export default function Imprimir() {
                 )} mm`}
               />
               <SpecItem label="Cantidad" value={quote.quantity} />
-              <SpecItem label="Tiempo corte" value={`${fmtNum(quote.cuttingTimeMin, 1)} min`} />
-              <SpecItem label="Tiempo grabado" value={`${fmtNum(quote.engravingTimeMin, 1)} min`} />
-              <SpecItem label="Margen" value={`${fmtNum(quote.profitMargin, 0)}%`} />
+              <div data-no-print="true" className="contents">
+                <SpecItem label="Tiempo corte" value={`${fmtNum(quote.cuttingTimeMin, 1)} min`} />
+                <SpecItem label="Tiempo grabado" value={`${fmtNum(quote.engravingTimeMin, 1)} min`} />
+                <SpecItem label="Margen" value={`${fmtNum(quote.profitMargin, 0)}%`} />
+              </div>
             </div>
           </div>
 
-          {/* Cost breakdown */}
-          <div className="mb-6">
+          {/* Cost breakdown - hidden on print */}
+          <div className="mb-6" data-no-print="true">
             <h2 className="text-sm font-semibold mb-2">Desglose de costos</h2>
             <table className="w-full text-sm border border-zinc-200">
               <tbody>

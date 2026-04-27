@@ -1,5 +1,5 @@
-import { useEffect, useState } from "react";
-import { Save } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Save, Upload, Trash2 } from "lucide-react";
 import { toast } from "sonner";
 import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
@@ -26,6 +26,7 @@ const currencyOptions = [
 export default function Configuracion() {
   const [form, setForm] = useState(null);
   const [saving, setSaving] = useState(false);
+  const fileInputRef = useRef(null);
 
   useEffect(() => {
     SettingsAPI.get().then(setForm).catch(() => toast.error("Error al cargar configuración"));
@@ -38,6 +39,40 @@ export default function Configuracion() {
   }
 
   const update = (k, v) => setForm({ ...form, [k]: v });
+
+  const handleLogoChange = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    if (!file.type.startsWith("image/")) {
+      toast.error("El archivo debe ser una imagen");
+      return;
+    }
+    if (file.size > 1024 * 1024) {
+      toast.error("La imagen es muy grande (máximo 1MB)");
+      return;
+    }
+    try {
+      const dataUrl = await new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => resolve(reader.result);
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+      const updated = await SettingsAPI.update({ logoDataUrl: dataUrl });
+      setForm(updated);
+      toast.success("Logo cargado");
+    } catch (err) {
+      toast.error("No se pudo cargar la imagen");
+    } finally {
+      if (fileInputRef.current) fileInputRef.current.value = "";
+    }
+  };
+
+  const handleLogoRemove = async () => {
+    const updated = await SettingsAPI.update({ logoDataUrl: "" });
+    setForm(updated);
+    toast.success("Logo eliminado");
+  };
 
   const submit = async (e) => {
     e.preventDefault();
@@ -79,6 +114,62 @@ export default function Configuracion() {
         <section className="surface p-5">
           <h2 className="text-base font-semibold mb-4">Negocio</h2>
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="md:col-span-2">
+              <Label className="field-label">Logo del negocio</Label>
+              <div className="mt-1.5 flex items-center gap-4 border border-zinc-200 p-3">
+                <div className="w-20 h-20 border border-dashed border-zinc-300 flex items-center justify-center bg-zinc-50 shrink-0">
+                  {form.logoDataUrl ? (
+                    <img
+                      src={form.logoDataUrl}
+                      alt="Logo"
+                      className="max-w-full max-h-full object-contain"
+                      data-testid="logo-preview"
+                    />
+                  ) : (
+                    <span className="text-[10px] font-mono uppercase tracking-[0.1em] text-zinc-400">
+                      Sin logo
+                    </span>
+                  )}
+                </div>
+                <div className="flex-1">
+                  <input
+                    ref={fileInputRef}
+                    type="file"
+                    accept="image/*"
+                    onChange={handleLogoChange}
+                    className="hidden"
+                    data-testid="cfg-logo-input"
+                  />
+                  <div className="flex flex-wrap gap-2">
+                    <Button
+                      type="button"
+                      variant="outline"
+                      onClick={() => fileInputRef.current?.click()}
+                      className="rounded-sm border-zinc-300"
+                      data-testid="cfg-logo-upload"
+                    >
+                      <Upload className="w-4 h-4 mr-2" />
+                      {form.logoDataUrl ? "Cambiar logo" : "Subir logo"}
+                    </Button>
+                    {form.logoDataUrl && (
+                      <Button
+                        type="button"
+                        variant="outline"
+                        onClick={handleLogoRemove}
+                        className="rounded-sm border-zinc-300 text-[#FF3333] hover:text-[#CC0000]"
+                        data-testid="cfg-logo-remove"
+                      >
+                        <Trash2 className="w-4 h-4 mr-2" />
+                        Eliminar
+                      </Button>
+                    )}
+                  </div>
+                  <p className="text-[11px] text-zinc-500 mt-2 font-mono">
+                    PNG / JPG / SVG · máx. 1MB · se mostrará en la cotización impresa.
+                  </p>
+                </div>
+              </div>
+            </div>
             <div className="md:col-span-2">
               <Label className="field-label">Nombre del negocio</Label>
               <Input
