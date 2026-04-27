@@ -6,6 +6,7 @@ import Cotizador from "@/pages/Cotizador";
 import Historial from "@/pages/Historial";
 import Materiales from "@/pages/Materiales";
 import Configuracion from "@/pages/Configuracion";
+import Autor from "@/pages/Autor";
 import Imprimir from "@/pages/Imprimir";
 
 function App() {
@@ -19,6 +20,7 @@ function App() {
             <Route path="/historial" element={<Historial />} />
             <Route path="/materiales" element={<Materiales />} />
             <Route path="/configuracion" element={<Configuracion />} />
+            <Route path="/autor" element={<Autor />} />
           </Route>
         </Routes>
       </BrowserRouter>

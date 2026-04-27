@@ -1,11 +1,12 @@
 import { NavLink, Outlet } from "react-router-dom";
-import { Calculator, History, Layers, Settings as SettingsIcon, Zap } from "lucide-react";
+import { Calculator, History, Layers, Settings as SettingsIcon, Zap, User } from "lucide-react";
 
 const navItems = [
   { to: "/", label: "Cotizador", icon: Calculator, end: true, testid: "nav-cotizador" },
   { to: "/historial", label: "Historial", icon: History, testid: "nav-historial" },
   { to: "/materiales", label: "Materiales", icon: Layers, testid: "nav-materiales" },
   { to: "/configuracion", label: "Configuración", icon: SettingsIcon, testid: "nav-configuracion" },
+  { to: "/autor", label: "Autor", icon: User, testid: "nav-autor" },
 ];
 
 export default function Layout() {
